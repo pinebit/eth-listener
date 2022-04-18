@@ -1,4 +1,4 @@
-package config
+package main
 
 import (
 	"io/ioutil"
@@ -7,16 +7,22 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-type Telegram struct {
+type TelegramConfig struct {
 	Token    string `yaml:"token"`
 	Username string `yaml:"username"`
 }
 
+type AliasConfig struct {
+	Address string `yaml:"address"`
+	Alias   string `yaml:"alias"`
+}
+
 type Config struct {
-	EthUrl    string    `yaml:"eth-url"`
-	Addresses []string  `yaml:"addresses"`
-	Tokens    []string  `yaml:"tokens"`
-	Telegram  *Telegram `yaml:"telegram"`
+	EthUrl    string          `yaml:"eth-url"`
+	Addresses []string        `yaml:"addresses"`
+	Tokens    []string        `yaml:"tokens"`
+	Telegram  *TelegramConfig `yaml:"telegram"`
+	Aliases   []AliasConfig   `yaml:"aliases"`
 }
 
 func LoadConfig(filepath string) (config *Config, err error) {

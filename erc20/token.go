@@ -1,7 +1,7 @@
 package erc20
 
 import (
-	"fmt"
+	"context"
 	"math"
 	"math/big"
 
@@ -15,22 +15,22 @@ import (
 
 var (
 	LogTransferSigHash = crypto.Keccak256Hash([]byte("Transfer(address,address,uint256)"))
+
+	ETHToken = &Token{
+		Symbol:   "ETH",
+		Decimals: 18,
+	}
 )
 
-type ERC20Token struct {
+type Token struct {
 	ContractAddress common.Address
-	Name            string
 	Symbol          string
 	Decimals        uint8
 	token           *ERC20
 }
 
-func FetchERC20Token(contractAddress common.Address, client *ethclient.Client) (*ERC20Token, error) {
+func FetchERC20Token(contractAddress common.Address, client *ethclient.Client) (*Token, error) {
 	token, err := NewERC20(contractAddress, client)
-	if err != nil {
-		return nil, err
-	}
-	name, err := token.Name(&bind.CallOpts{})
 	if err != nil {
 		return nil, err
 	}
@@ -42,27 +42,29 @@ func FetchERC20Token(contractAddress common.Address, client *ethclient.Client) (
 	if err != nil {
 		return nil, err
 	}
-	return &ERC20Token{
+	return &Token{
 		ContractAddress: contractAddress,
-		Name:            name,
 		Symbol:          symbol,
 		Decimals:        decimals,
 		token:           token,
 	}, nil
 }
 
-func (t ERC20Token) ConvertValue(value *big.Int) *big.Float {
-	return new(big.Float).Quo(new(big.Float).SetInt(value), big.NewFloat(math.Pow10(int(t.Decimals))))
+func (t Token) ConvertValue(value *big.Int) *big.Float {
+	bf := new(big.Float).SetMode(big.AwayFromZero)
+	return bf.Quo(new(big.Float).SetInt(value), big.NewFloat(math.Pow10(int(t.Decimals))))
 }
 
-func (t ERC20Token) FetchBalance(client *ethclient.Client, addr common.Address) (*big.Float, error) {
-	balance, err := t.token.BalanceOf(&bind.CallOpts{}, addr)
-	if err != nil {
-		return nil, err
+func (t Token) FetchBalance(client *ethclient.Client, addr common.Address) string {
+	var val *big.Int
+	var err error
+	if t.token == nil {
+		val, err = client.PendingBalanceAt(context.Background(), addr)
+	} else {
+		val, err = t.token.BalanceOf(&bind.CallOpts{}, addr)
 	}
-	return t.ConvertValue(balance), nil
-}
-
-func (t ERC20Token) String() string {
-	return fmt.Sprintf("%s (%s) at %s", t.Symbol, t.Name, t.ContractAddress.String())
+	if err != nil {
+		return "N/A"
+	}
+	return t.ConvertValue(val).String()
 }

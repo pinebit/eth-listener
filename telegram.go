@@ -1,9 +1,8 @@
-package telegram
+package main
 
 import (
 	"log"
 
-	"github.com/pinebit/eth-listener/config"
 	"go.uber.org/atomic"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
@@ -20,7 +19,7 @@ type telegram struct {
 	chatID     int64
 }
 
-func NewTelegram(cfg *config.Telegram) Telegram {
+func NewTelegram(cfg *TelegramConfig) Telegram {
 	bot, err := tgbotapi.NewBotAPI(cfg.Token)
 	if err != nil {
 		log.Fatal(err)
@@ -60,12 +59,16 @@ func (t *telegram) updatesLoop() {
 
 			msg := tgbotapi.NewMessage(update.Message.Chat.ID, "You are subscribed!")
 			t.bot.Send(msg)
+
+			log.Printf("Telegram Bot subscribed: %s", update.Message.From)
 		}
 		if update.Message.Text == "/unsubscribe" {
 			t.subscribed.Store(false)
 
 			msg := tgbotapi.NewMessage(update.Message.Chat.ID, "You are unsubscribed.")
 			t.bot.Send(msg)
+
+			log.Printf("Telegram Bot unsubscribed: %s", update.Message.From)
 		}
 	}
 
