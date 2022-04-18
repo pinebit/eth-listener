@@ -7,9 +7,9 @@ All configuration is done by editing `config.yaml` file.
 1. Specify your ETH node URL. If you don't have one, use 3rd-party providers such as [alchemy](https://alchemy.com/?r=62491cd8ac883927) to create one.
 2. Enter your ETH account addresses you want to watch (there may be many addresses).
 3. Enter your token contract addresses you want to watch (there may be many contract addresses).
-4. Confgiure your Telegram bot but specifying bot's token and your Telegram username.
+4. Confgiure your Telegram bot by specifying bot's token and your Telegram username.
 
-## Using
+## Usage
 After you edited `config.yaml`, just start the app by `go run .`
 You will see the output like this:
 ```
