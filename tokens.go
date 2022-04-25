@@ -88,6 +88,7 @@ func (tm *tokensManager) GetToken(ctx context.Context, contractAddress common.Ad
 	}
 
 	log.Printf("Detected new token: %s at %s", symbol, contractAddress)
+	promNewTokenFetched.Inc()
 
 	t = &Token{
 		Address:  contractAddress,

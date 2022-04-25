@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"math/big"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
@@ -11,11 +12,13 @@ import (
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 func handleHeader(ctx context.Context, header *types.Header, transfersCh chan *Transfer, app *App) {
 	block, err := app.client.BlockByNumber(ctx, header.Number)
 	if err != nil {
+		promMissingBlockError.Inc()
 		return
 	}
 
@@ -51,11 +54,12 @@ func handleHeader(ctx context.Context, header *types.Header, transfersCh chan *T
 	filterQuery.ToBlock = block.Number()
 	logs, err := app.client.FilterLogs(ctx, filterQuery)
 	if err != nil {
+		promFilterLogsError.Inc()
 		return
 	}
 
 	for _, logItem := range logs {
-		if logItem.Topics[0] != LogTransferSigHash || len(logItem.Topics) != 3 {
+		if len(logItem.Topics) != 3 || logItem.Topics[0] != LogTransferSigHash {
 			continue
 		}
 
@@ -109,6 +113,13 @@ func main() {
 		cancel()
 	}()
 
+	http.Handle("/metrics", promhttp.Handler())
+	go func() {
+		if err := http.ListenAndServe(":8080", nil); err != nil {
+			log.Fatalf("Failed to start prometheus server: %v", err)
+		}
+	}()
+
 	app, err := WireApp(ConfigPath)
 	if err != nil {
 		log.Fatal(err)
@@ -135,6 +146,7 @@ mainLoop:
 		case err := <-sub.Err():
 			log.Fatalf("Head subscription error: %v", err)
 		case header := <-headsCh:
+			promHeadersReceived.Inc()
 			handleHeader(ctx, header, transfersCh, app)
 		}
 	}
