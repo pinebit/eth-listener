@@ -63,7 +63,6 @@ func (tdb tokensDB) AddToken(token *Token) error {
 		return err
 	}
 
-	log.Printf("TokensDB: saving token: %s for %s", token.Symbol, token.Address)
 	return tdb.db.Put(token.Address.Bytes(), buf.Bytes(), nil)
 }
 
@@ -83,8 +82,6 @@ func (tdb tokensDB) GetToken(addr common.Address) (*Token, error) {
 	if err := gob.NewDecoder(buf).Decode(&dto); err != nil {
 		return nil, err
 	}
-
-	log.Printf("TokensDB: fetched token: %s for %s", dto.Symbol, addr)
 
 	return &Token{
 		Address:  addr,

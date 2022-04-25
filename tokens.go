@@ -3,9 +3,7 @@ package main
 import (
 	"context"
 	"errors"
-	"fmt"
 	"log"
-	"math"
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
@@ -13,22 +11,6 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/pinebit/eth-listener/erc20"
 )
-
-type Token struct {
-	Address  common.Address
-	Symbol   string
-	Decimals uint8
-}
-
-var zeroAddress = common.HexToAddress("0x0")
-
-// To unify transfers processing we mimic ETH to be a token.
-// Address is set to 0 and not used for this "token".
-var ETHToken = &Token{
-	Address:  zeroAddress,
-	Symbol:   "ETH",
-	Decimals: 18,
-}
 
 type TokensManager interface {
 	// Returns token for the given contract address or error.
@@ -88,7 +70,6 @@ func (tm *tokensManager) GetToken(ctx context.Context, contractAddress common.Ad
 	}
 
 	log.Printf("Detected new token: %s at %s", symbol, contractAddress)
-	promNewTokenFetched.Inc()
 
 	t = &Token{
 		Address:  contractAddress,
@@ -115,9 +96,4 @@ func (tm *tokensManager) FetchBalance(ctx context.Context, token *Token, addr co
 		return nil, err
 	}
 	return erc20t.BalanceOf(&bind.CallOpts{}, addr)
-}
-
-func (t Token) RenderValue(value *big.Int) string {
-	val := new(big.Float).Quo(new(big.Float).SetInt(value), big.NewFloat(math.Pow10(int(t.Decimals))))
-	return fmt.Sprintf("%s %s", val.String(), t.Symbol)
 }
