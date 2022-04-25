@@ -132,6 +132,8 @@ mainLoop:
 		select {
 		case <-ctx.Done():
 			break mainLoop
+		case err := <-sub.Err():
+			log.Fatalf("Head subscription error: %v", err)
 		case header := <-headsCh:
 			handleHeader(ctx, header, transfersCh, app)
 		}
