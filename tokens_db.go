@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"encoding/gob"
 	"log"
+	"os"
+	"path"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/syndtr/goleveldb/leveldb"
@@ -20,7 +22,12 @@ type tokensDB struct {
 }
 
 func NewTokensDB() TokensDB {
-	db, err := leveldb.OpenFile(TokensDBPath, nil)
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		log.Panic(err)
+	}
+	tdbPath := path.Join(homeDir, TokensDBPath)
+	db, err := leveldb.OpenFile(tdbPath, nil)
 	if err != nil {
 		log.Panicf("Failed to open TokensDB: %v", err)
 	}
