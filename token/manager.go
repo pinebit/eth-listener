@@ -1,15 +1,14 @@
-package main
+package token
 
 import (
 	"context"
 	"errors"
-	"log"
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
-	"github.com/pinebit/eth-listener/erc20"
+	"github.com/pinebit/eth-listener/token/erc20"
 )
 
 type TokensManager interface {
@@ -68,8 +67,6 @@ func (tm *tokensManager) GetToken(ctx context.Context, contractAddress common.Ad
 		tm.tokens[contractAddress] = nil // remember as non-ERC20 token
 		return nil, errors.New("empty token symbol, ignoring as malformed token")
 	}
-
-	log.Printf("Detected new token: %s at %s", symbol, contractAddress)
 
 	t = &Token{
 		Address:  contractAddress,

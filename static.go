@@ -5,7 +5,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/pinebit/eth-listener/erc20"
+	"github.com/pinebit/eth-listener/token/erc20"
 )
 
 const (

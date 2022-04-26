@@ -9,6 +9,7 @@ import (
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/pinebit/eth-listener/token"
 )
 
 func handleTransfer(transfer *Transfer, app *App, ctx context.Context) {
@@ -64,7 +65,7 @@ func handleHeader(ctx context.Context, header *types.Header, transfersCh chan<- 
 					From:      msg.From(),
 					To:        *tx.To(),
 					Value:     *tx.Value(),
-					Token:     ETHToken,
+					Token:     token.ETHToken,
 				}
 			}
 		}
@@ -74,7 +75,7 @@ func handleHeader(ctx context.Context, header *types.Header, transfersCh chan<- 
 				From:      msg.From(),
 				To:        *tx.To(),
 				Value:     *tx.Value(),
-				Token:     ETHToken,
+				Token:     token.ETHToken,
 			}
 		}
 	}

@@ -2,18 +2,19 @@ package main
 
 import (
 	"github.com/ethereum/go-ethereum/ethclient"
+	"github.com/pinebit/eth-listener/token"
 )
 
 type App struct {
 	config        *Config
-	tokensDB      TokensDB
+	tokensDB      token.TokensDB
 	accounts      Accounts
 	telegram      Telegram
 	client        *ethclient.Client
-	tokensManager TokensManager
+	tokensManager token.TokensManager
 }
 
-func NewApp(config *Config, tokensDB TokensDB, accounts Accounts, telegram Telegram, client *ethclient.Client, tokensManager TokensManager) *App {
+func NewApp(config *Config, tokensDB token.TokensDB, accounts Accounts, telegram Telegram, client *ethclient.Client, tokensManager token.TokensManager) *App {
 	return &App{
 		config:        config,
 		tokensDB:      tokensDB,

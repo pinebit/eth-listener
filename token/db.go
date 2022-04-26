@@ -1,4 +1,4 @@
-package main
+package token
 
 import (
 	"bytes"
@@ -21,12 +21,12 @@ type tokensDB struct {
 	db *leveldb.DB
 }
 
-func NewTokensDB() TokensDB {
+func NewTokensDB(dbPath string) TokensDB {
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
 		log.Panic(err)
 	}
-	tdbPath := path.Join(homeDir, TokensDBPath)
+	tdbPath := path.Join(homeDir, dbPath)
 	db, err := leveldb.OpenFile(tdbPath, nil)
 	if err != nil {
 		log.Panicf("Failed to open TokensDB: %v", err)

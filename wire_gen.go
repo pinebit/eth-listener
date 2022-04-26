@@ -8,6 +8,7 @@ package main
 
 import (
 	"github.com/ethereum/go-ethereum/ethclient"
+	"github.com/pinebit/eth-listener/token"
 )
 
 // Injectors from wire.go:
@@ -17,15 +18,15 @@ func WireApp(configPath string) (*App, error) {
 	if err != nil {
 		return nil, err
 	}
-	mainTokensDB := NewTokensDB()
+	tokensDB := newTokensDB()
 	accounts := NewAccounts(config)
 	mainTelegram := NewTelegram(config)
 	client, err := newEthClient(config)
 	if err != nil {
 		return nil, err
 	}
-	mainTokensManager := NewTokensManager(client, mainTokensDB)
-	app := NewApp(config, mainTokensDB, accounts, mainTelegram, client, mainTokensManager)
+	tokensManager := token.NewTokensManager(client, tokensDB)
+	app := NewApp(config, tokensDB, accounts, mainTelegram, client, tokensManager)
 	return app, nil
 }
 
@@ -33,4 +34,8 @@ func WireApp(configPath string) (*App, error) {
 
 func newEthClient(config *Config) (*ethclient.Client, error) {
 	return ethclient.Dial(config.EthUrl)
+}
+
+func newTokensDB() token.TokensDB {
+	return token.NewTokensDB(TokensDBPath)
 }

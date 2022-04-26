@@ -4,6 +4,7 @@ import (
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/pinebit/eth-listener/token"
 )
 
 type Direction int
@@ -18,5 +19,5 @@ type Transfer struct {
 	From      common.Address
 	To        common.Address
 	Value     big.Int
-	Token     *Token
+	Token     *token.Token
 }
